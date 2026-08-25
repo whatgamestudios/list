@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ca7b2767eaeda4be4bbe99197e549491
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 127249
+  packageName: Native Share For Android And iOS
+  packageVersion: 3.1
+  assetPath: Assets/Plugins/SunShine Native Share/Scripts/AndroidShare.cs
+  uploadId: 783501

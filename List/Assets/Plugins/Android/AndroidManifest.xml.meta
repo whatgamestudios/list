@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b1a2667b0cd24f24f84dce1c82d2bbe5
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 127249
+  packageName: Native Share For Android And iOS
+  packageVersion: 3.1
+  assetPath: Assets/Plugins/Android/AndroidManifest.xml
+  uploadId: 783501
