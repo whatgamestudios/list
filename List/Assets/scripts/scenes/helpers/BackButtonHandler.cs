@@ -11,17 +11,46 @@ namespace Lists {
 
     public class BackButtonHandler : MonoBehaviour
     {
+        private InputAction backAction;
+        private Coroutine enableCoroutine;
 
-        public void OnButtonClick(string buttonText)
+        private void Awake()
         {
-            if (buttonText == "Back")
+            backAction = new InputAction("Back", binding: "<Keyboard>/escape");
+            backAction.performed += OnBackPerformed;
+            
+            // Start the delayed enable coroutine
+            enableCoroutine = StartCoroutine(DelayedEnable());
+        }
+
+        private IEnumerator DelayedEnable()
+        {
+            yield return new WaitForSeconds(0.5f); // 500ms delay
+            backAction.Enable();
+            var currentScene = SceneManager.GetActiveScene().buildIndex;
+            // AuditLog.Log($"Android Back button enabled in scene {currentScene} after delay");
+        }
+
+        private void OnDisable()
+        {
+            if (enableCoroutine != null)
             {
-                GoBack();
+                StopCoroutine(enableCoroutine);
+                enableCoroutine = null;
             }
-            else
-            {
-                AuditLog.Log($"BackButton: Unknown button: {buttonText}");
-            }
+            backAction.Disable();
+            var currentScene = SceneManager.GetActiveScene().buildIndex;
+            // AuditLog.Log($"Android Back button disabled in scene {currentScene}");
+        }
+
+        private void OnBackPerformed(InputAction.CallbackContext context)
+        {
+            GoBack();
+        }
+
+        public void OnButtonClickBack()
+        {
+            GoBack();
         }
 
         public static void GoBack() {
@@ -34,6 +63,6 @@ namespace Lists {
             var previousScene = SceneStack.Instance().PopScene();
             AuditLog.Log($"Back: switching from scene {currentScene} to scene {previousScene}");
             SceneManager.LoadScene(previousScene, LoadSceneMode.Single);
-        }
+        } 
     }
 }

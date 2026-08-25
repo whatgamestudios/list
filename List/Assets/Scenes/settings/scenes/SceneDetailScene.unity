@@ -481,7 +481,6 @@ GameObject:
   - component: {fileID: 1019850578}
   - component: {fileID: 1019850577}
   - component: {fileID: 1019850576}
-  - component: {fileID: 1019850575}
   - component: {fileID: 1019850574}
   m_Layer: 0
   m_Name: ScriptsHolderObj
@@ -504,18 +503,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Lists.SceneDetailScreen
   sceneName: {fileID: 816804337}
   sceneMetadata: {fileID: 1951022285}
---- !u!114 &1019850575
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1019850573}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8af67a7c646254479beb19a99901c5a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Lists.BackButtonHandlerAndroid
 --- !u!114 &1019850576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -778,8 +765,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1019850576}
         m_TargetAssemblyTypeName: Lists.BackButtonHandler, Assembly-CSharp
-        m_MethodName: OnButtonClick
-        m_Mode: 5
+        m_MethodName: OnButtonClickBack
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
