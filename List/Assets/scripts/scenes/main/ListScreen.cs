@@ -6,50 +6,35 @@ using TMPro;
 
 namespace Lists {
 
-    public class MainScreen : MonoBehaviour {
+    public class ListScreen : MonoBehaviour {
 
         public GameObject listsPanel;
+        public TextMeshProUGUI titleText;
 
         private const string DefaultTypeImagePath = "listtypes/listtype-scroll";
         private const string DefaultContactImagePath = "contact-images/contact-none";
         private const float ItemHeight = 200f;
-        private const float ItemImageSize = 90f;
-        private const float LeftColumnWidth = ItemImageSize + 20f;
+        private const float LeftColumnWidth = 20f;
 
         private RectTransform listsContent;
         private RectTransform addItemRow;
+        private ListEntry list;
 
         public void Start() {
-            AuditLog.Log("Main screen");
+            AuditLog.Log("List screen");
+            list = ListsStore.Lists[ListsStore.CurrentListIndex];
+            if (titleText != null) {
+                titleText.text = list.Title;
+            }
             BuildListsPanel();
-        }
-
-        public void OnButtonClickSettings()
-        {
-            SceneStack.Instance().PushScene();
-            SceneManager.LoadScene("SettingsScene", LoadSceneMode.Single);
-        }
-
-        public void OnButtonClickContacts()
-        {
-            SceneStack.Instance().PushScene();
-            SceneManager.LoadScene("ContractsScene", LoadSceneMode.Single);
         }
 
         public void OnButtonClickAddItem()
         {
-            ListEntry entry = new ListEntry();
-            ListsStore.Lists.Add(entry);
-            RectTransform newRow = CreateListItemRow(entry, ListsStore.Lists.Count - 1);
+            list.Items.Add("");
+            RectTransform newRow = CreateListItemRow(list.Items.Count - 1);
             newRow.SetSiblingIndex(addItemRow.GetSiblingIndex());
-            AuditLog.Log("Added new list");
-        }
-
-        private void OpenList(int index)
-        {
-            ListsStore.CurrentListIndex = index;
-            SceneStack.Instance().PushScene();
-            SceneManager.LoadScene("ListScene", LoadSceneMode.Single);
+            AuditLog.Log("Added new item");
         }
 
         private void BuildListsPanel()
@@ -103,9 +88,9 @@ namespace Lists {
             scroll.movementType = ScrollRect.MovementType.Clamped;
             scroll.scrollSensitivity = 30;
 
-            for (int i = 0; i < ListsStore.Lists.Count; i++)
+            for (int i = 0; i < list.Items.Count; i++)
             {
-                CreateListItemRow(ListsStore.Lists[i], i);
+                CreateListItemRow(i);
             }
 
             addItemRow = CreateAddItemRow();
@@ -113,74 +98,77 @@ namespace Lists {
             scrollObj.SetActive(true);
         }
 
-        private RectTransform CreateListItemRow(ListEntry entry, int index)
+        private RectTransform CreateListItemRow(int index)
         {
-            GameObject row = new GameObject("ListItem", typeof(RectTransform), typeof(LayoutElement), typeof(Image), typeof(Button));
+            GameObject row = new GameObject("ListItem", typeof(RectTransform), typeof(LayoutElement));
             row.SetActive(false);
             RectTransform rowRect = row.GetComponent<RectTransform>();
             rowRect.SetParent(listsContent, false);
             LayoutElement rowLayout = row.GetComponent<LayoutElement>();
             rowLayout.preferredHeight = ItemHeight;
 
-            Image rowBackground = row.GetComponent<Image>();
-            rowBackground.color = new Color(1f, 1f, 1f, 0.06f);
-
-            Button rowButton = row.GetComponent<Button>();
-            rowButton.targetGraphic = rowBackground;
-            rowButton.onClick.AddListener(() => OpenList(index));
-
-            GameObject typeImageObj = new GameObject("TypeImage", typeof(RectTransform), typeof(Image));
-            RectTransform typeImageRect = typeImageObj.GetComponent<RectTransform>();
-            typeImageRect.SetParent(rowRect, false);
-            typeImageRect.anchorMin = new Vector2(0, 1);
-            typeImageRect.anchorMax = new Vector2(0, 1);
-            typeImageRect.pivot = new Vector2(0, 1);
-            typeImageRect.sizeDelta = new Vector2(ItemImageSize, ItemImageSize);
-            typeImageRect.anchoredPosition = Vector2.zero;
-            Image typeImage = typeImageObj.GetComponent<Image>();
-            typeImage.sprite = Resources.Load<Sprite>(DefaultTypeImagePath);
-            typeImage.preserveAspect = true;
-
-            GameObject contactImageObj = new GameObject("ContactImage", typeof(RectTransform), typeof(Image));
-            RectTransform contactImageRect = contactImageObj.GetComponent<RectTransform>();
-            contactImageRect.SetParent(rowRect, false);
-            contactImageRect.anchorMin = new Vector2(0, 0);
-            contactImageRect.anchorMax = new Vector2(0, 0);
-            contactImageRect.pivot = new Vector2(0, 0);
-            contactImageRect.sizeDelta = new Vector2(ItemImageSize, ItemImageSize);
-            contactImageRect.anchoredPosition = Vector2.zero;
-            Image contactImage = contactImageObj.GetComponent<Image>();
-            contactImage.sprite = Resources.Load<Sprite>(DefaultContactImagePath);
-            contactImage.preserveAspect = true;
-
-            // Text
-            GameObject titleObj = new GameObject("Title", typeof(RectTransform), typeof(Image));
-            RectTransform titleRect = titleObj.GetComponent<RectTransform>();
-            titleRect.SetParent(rowRect, false);
-            titleRect.anchorMin = new Vector2(0, 0);
-            titleRect.anchorMax = new Vector2(1, 1);
-            titleRect.offsetMin = new Vector2(LeftColumnWidth, 0);
-            titleRect.offsetMax = new Vector2(0, 0);
-            Image titleBackground = titleObj.GetComponent<Image>();
-            titleBackground.color = new Color(0.95f, 0.95f, 0.95f, 1f);
-
-            GameObject textObj = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
-            RectTransform textRect = textObj.GetComponent<RectTransform>();
-            textRect.SetParent(titleRect, false);
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = new Vector2(20, 10);
-            textRect.offsetMax = new Vector2(-20, -10);
-            TextMeshProUGUI titleText = textObj.GetComponent<TextMeshProUGUI>();
-            titleText.text = string.IsNullOrEmpty(entry.Title) ? "New Item" : entry.Title;
-            titleText.fontSize = 80;
-            titleText.color = Color.black;
-            titleText.alignment = TextAlignmentOptions.MidlineLeft;
+            CreateTitleInputField(rowRect, index);
 
             row.SetActive(true);
             return rowRect;
         }
 
+        private void CreateTitleInputField(RectTransform rowRect, int index)
+        {
+            GameObject inputObj = new GameObject("TitleInput", typeof(RectTransform), typeof(Image), typeof(TMP_InputField));
+            RectTransform inputRect = inputObj.GetComponent<RectTransform>();
+            inputRect.SetParent(rowRect, false);
+            inputRect.anchorMin = new Vector2(0, 0);
+            inputRect.anchorMax = new Vector2(1, 1);
+            inputRect.offsetMin = new Vector2(LeftColumnWidth, 0);
+            inputRect.offsetMax = new Vector2(0, 0);
+            Image inputBackground = inputObj.GetComponent<Image>();
+            inputBackground.color = new Color(0.95f, 0.95f, 0.95f, 1f);
+
+            GameObject textAreaObj = new GameObject("TextArea", typeof(RectTransform), typeof(RectMask2D));
+            RectTransform textAreaRect = textAreaObj.GetComponent<RectTransform>();
+            textAreaRect.SetParent(inputRect, false);
+            textAreaRect.anchorMin = Vector2.zero;
+            textAreaRect.anchorMax = Vector2.one;
+            textAreaRect.offsetMin = new Vector2(20, 10);
+            textAreaRect.offsetMax = new Vector2(-20, -10);
+
+            GameObject placeholderObj = new GameObject("Placeholder", typeof(RectTransform), typeof(TextMeshProUGUI));
+            RectTransform placeholderRect = placeholderObj.GetComponent<RectTransform>();
+            placeholderRect.SetParent(textAreaRect, false);
+            placeholderRect.anchorMin = Vector2.zero;
+            placeholderRect.anchorMax = Vector2.one;
+            placeholderRect.offsetMin = Vector2.zero;
+            placeholderRect.offsetMax = Vector2.zero;
+            TextMeshProUGUI placeholderText = placeholderObj.GetComponent<TextMeshProUGUI>();
+            placeholderText.text = "Enter item";
+            placeholderText.fontSize = 45;
+            placeholderText.fontStyle = FontStyles.Italic;
+            placeholderText.color = new Color(0f, 0f, 0f, 0.5f);
+            placeholderText.alignment = TextAlignmentOptions.MidlineLeft;
+
+            GameObject textObj = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+            RectTransform textRect = textObj.GetComponent<RectTransform>();
+            textRect.SetParent(textAreaRect, false);
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+            TextMeshProUGUI titleText = textObj.GetComponent<TextMeshProUGUI>();
+            titleText.fontSize = 45;
+            titleText.color = Color.black;
+            titleText.alignment = TextAlignmentOptions.MidlineLeft;
+
+            TMP_InputField inputField = inputObj.GetComponent<TMP_InputField>();
+            inputField.targetGraphic = inputBackground;
+            inputField.textViewport = textAreaRect;
+            inputField.textComponent = titleText;
+            inputField.placeholder = placeholderText;
+            inputField.lineType = TMP_InputField.LineType.SingleLine;
+            inputField.characterLimit = 60;
+            inputField.text = list.Items[index];
+            inputField.onValueChanged.AddListener(value => list.Items[index] = value);
+        }
 
         private RectTransform CreateAddItemRow()
         {
@@ -206,7 +194,7 @@ namespace Lists {
             labelRect.offsetMin = Vector2.zero;
             labelRect.offsetMax = Vector2.zero;
             TextMeshProUGUI label = labelObj.GetComponent<TextMeshProUGUI>();
-            label.text = "+ Add List";
+            label.text = "+ Add Item";
             label.fontSize = 50;
             label.color = Color.white;
             label.alignment = TextAlignmentOptions.Center;
