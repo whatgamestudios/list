@@ -15,6 +15,7 @@ namespace Lists {
         private const string DefaultContactImagePath = "contact-images/contact-none";
         private const float ItemHeight = 200f;
         private const float LeftColumnWidth = 20f;
+        private const float AddListButtonWidthReduction = 100f;
 
         private RectTransform listsContent;
         private RectTransform addItemRow;
@@ -102,8 +103,8 @@ namespace Lists {
             scrollRect.SetParent(panelRect, false);
             scrollRect.anchorMin = Vector2.zero;
             scrollRect.anchorMax = Vector2.one;
-            scrollRect.offsetMin = Vector2.zero;
-            scrollRect.offsetMax = Vector2.zero;
+            scrollRect.offsetMin = new Vector2(0, 25);
+            scrollRect.offsetMax = new Vector2(0, -25);
 
             GameObject viewportObj = new GameObject("Viewport", typeof(RectTransform), typeof(RectMask2D));
             RectTransform viewportRect = viewportObj.GetComponent<RectTransform>();
@@ -227,27 +228,38 @@ namespace Lists {
 
         private RectTransform CreateAddItemRow()
         {
-            GameObject row = new GameObject("AddItemButton", typeof(RectTransform), typeof(LayoutElement), typeof(Image), typeof(Button));
+            GameObject row = new GameObject("AddItemButton", typeof(RectTransform), typeof(LayoutElement));
             row.SetActive(false);
             RectTransform rowRect = row.GetComponent<RectTransform>();
             rowRect.SetParent(listsContent, false);
             LayoutElement rowLayout = row.GetComponent<LayoutElement>();
             rowLayout.preferredHeight = 140f;
 
-            Image background = row.GetComponent<Image>();
+            // Narrower visual button inset within the full-width layout row, so it stays
+            // AddListButtonWidthReduction pixels narrower than the other rows without fighting
+            // the VerticalLayoutGroup's childForceExpandWidth on the row itself.
+            GameObject buttonObj = new GameObject("Button", typeof(RectTransform), typeof(Image), typeof(Button));
+            RectTransform buttonRect = buttonObj.GetComponent<RectTransform>();
+            buttonRect.SetParent(rowRect, false);
+            buttonRect.anchorMin = Vector2.zero;
+            buttonRect.anchorMax = Vector2.one;
+            buttonRect.offsetMin = new Vector2(AddListButtonWidthReduction / 2f, 0);
+            buttonRect.offsetMax = new Vector2(-AddListButtonWidthReduction / 2f, 0);
+
+            Image background = buttonObj.GetComponent<Image>();
             background.color = new Color(0.2f, 0.45f, 0.85f, 1f);
 
-            Button button = row.GetComponent<Button>();
+            Button button = buttonObj.GetComponent<Button>();
             button.targetGraphic = background;
             button.onClick.AddListener(OnButtonClickAddItem);
 
             GameObject labelObj = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
             RectTransform labelRect = labelObj.GetComponent<RectTransform>();
-            labelRect.SetParent(rowRect, false);
+            labelRect.SetParent(buttonRect, false);
             labelRect.anchorMin = Vector2.zero;
             labelRect.anchorMax = Vector2.one;
-            labelRect.offsetMin = Vector2.zero;
-            labelRect.offsetMax = Vector2.zero;
+            labelRect.offsetMin = Vector2.one;
+            labelRect.offsetMax = Vector2.one;
             TextMeshProUGUI label = labelObj.GetComponent<TextMeshProUGUI>();
             label.text = "+ Add Item";
             label.fontSize = 50;
