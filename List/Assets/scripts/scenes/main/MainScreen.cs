@@ -41,6 +41,7 @@ namespace Lists {
         {
             ListEntry entry = new ListEntry();
             ListsStore.Lists.Add(entry);
+            ListsStore.Save();
             RectTransform newRow = CreateListItemRow(entry, ListsStore.Lists.Count - 1);
             newRow.SetSiblingIndex(addItemRow.GetSiblingIndex());
             AuditLog.Log("Added new list");

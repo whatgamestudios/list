@@ -80,7 +80,7 @@ namespace Lists {
             inputField.lineType = TMP_InputField.LineType.SingleLine;
             inputField.characterLimit = 60;
             inputField.text = list.Title;
-            inputField.onValueChanged.AddListener(value => list.Title = value);
+            inputField.onValueChanged.AddListener(value => { list.Title = value; ListsStore.Save(); });
 
             titleObj.SetActive(true);
         }
@@ -88,6 +88,7 @@ namespace Lists {
         public void OnButtonClickAddItem()
         {
             list.Items.Add("");
+            ListsStore.Save();
             RectTransform newRow = CreateListItemRow(list.Items.Count - 1);
             newRow.SetSiblingIndex(addItemRow.GetSiblingIndex());
 
@@ -230,7 +231,7 @@ namespace Lists {
             inputField.lineType = TMP_InputField.LineType.SingleLine;
             inputField.characterLimit = 60;
             inputField.text = list.Items[index];
-            inputField.onValueChanged.AddListener(value => list.Items[index] = value);
+            inputField.onValueChanged.AddListener(value => { list.Items[index] = value; ListsStore.Save(); });
         }
 
         private RectTransform CreateAddItemRow()
