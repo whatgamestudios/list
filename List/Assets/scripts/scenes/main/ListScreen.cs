@@ -23,10 +23,65 @@ namespace Lists {
         public void Start() {
             AuditLog.Log("List screen");
             list = ListsStore.Lists[ListsStore.CurrentListIndex];
-            if (titleText != null) {
-                titleText.text = list.Title;
-            }
+            BuildTitleField();
             BuildListsPanel();
+        }
+
+        private void BuildTitleField()
+        {
+            if (titleText == null) return;
+
+            RectTransform titleRect = titleText.GetComponent<RectTransform>();
+            GameObject titleObj = titleText.gameObject;
+            titleObj.SetActive(false);
+            Destroy(titleText);
+
+            GameObject textAreaObj = new GameObject("TextArea", typeof(RectTransform), typeof(RectMask2D));
+            RectTransform textAreaRect = textAreaObj.GetComponent<RectTransform>();
+            textAreaRect.SetParent(titleRect, false);
+            textAreaRect.anchorMin = Vector2.zero;
+            textAreaRect.anchorMax = Vector2.one;
+            textAreaRect.offsetMin = Vector2.zero;
+            textAreaRect.offsetMax = Vector2.zero;
+
+            GameObject placeholderObj = new GameObject("Placeholder", typeof(RectTransform), typeof(TextMeshProUGUI));
+            RectTransform placeholderRect = placeholderObj.GetComponent<RectTransform>();
+            placeholderRect.SetParent(textAreaRect, false);
+            placeholderRect.anchorMin = Vector2.zero;
+            placeholderRect.anchorMax = Vector2.one;
+            placeholderRect.offsetMin = Vector2.zero;
+            placeholderRect.offsetMax = Vector2.zero;
+            TextMeshProUGUI placeholderText = placeholderObj.GetComponent<TextMeshProUGUI>();
+            placeholderText.text = "New List";
+            placeholderText.fontSize = 90;
+            placeholderText.fontStyle = FontStyles.Bold;
+            placeholderText.color = Color.gray;
+            placeholderText.alignment = TextAlignmentOptions.Left;
+
+            GameObject textObj = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+            RectTransform textRect = textObj.GetComponent<RectTransform>();
+            textRect.SetParent(textAreaRect, false);
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+            TextMeshProUGUI titleLabel = textObj.GetComponent<TextMeshProUGUI>();
+            titleLabel.fontSize = 90;
+            titleLabel.fontStyle = FontStyles.Bold;
+            titleLabel.color = Color.black;
+            titleLabel.alignment = TextAlignmentOptions.Left;
+
+            TMP_InputField inputField = titleObj.AddComponent<TMP_InputField>();
+            inputField.targetGraphic = titleLabel;
+            inputField.textViewport = textAreaRect;
+            inputField.textComponent = titleLabel;
+            inputField.placeholder = placeholderText;
+            inputField.lineType = TMP_InputField.LineType.SingleLine;
+            inputField.characterLimit = 60;
+            inputField.text = list.Title;
+            inputField.onValueChanged.AddListener(value => list.Title = value);
+
+            titleObj.SetActive(true);
         }
 
         public void OnButtonClickAddItem()
