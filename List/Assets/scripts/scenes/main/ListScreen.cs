@@ -90,6 +90,13 @@ namespace Lists {
             list.Items.Add("");
             RectTransform newRow = CreateListItemRow(list.Items.Count - 1);
             newRow.SetSiblingIndex(addItemRow.GetSiblingIndex());
+
+            TMP_InputField newField = newRow.GetComponentInChildren<TMP_InputField>();
+            if (newField != null) {
+                newField.Select();
+                newField.ActivateInputField();
+            }
+
             AuditLog.Log("Added new item");
         }
 
