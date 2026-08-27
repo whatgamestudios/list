@@ -23,6 +23,11 @@
             <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
             <meta-data android:name="android.app.lib_name" android:value="game" />
         </activity -->
+        <!--Hosts a single BiometricPrompt call for AndroidBiometricAuth.cs, since
+             Unity's own Activity is not a FragmentActivity -->
+        <activity android:name="com.whatgamestudios.lists.biometric.BiometricActivity"
+                  android:theme="@android:style/Theme.Translucent.NoTitleBar"
+                  android:exported="false" />
         <!--Used for Passport -->
         <activity android:name="com.immutable.unity.RedirectActivity" android:exported="true" >
             <intent-filter android:autoVerify="true">

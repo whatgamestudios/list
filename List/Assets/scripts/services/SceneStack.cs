@@ -11,7 +11,10 @@ namespace Lists {
 
     public class SceneStack
     {
-        public const int MENU_SCENE = 1;
+        // Build index of MainScene. AuthScene was inserted between WelcomeScene (0)
+        // and MainScene, so this is no longer 1 - keep it in sync with
+        // ProjectSettings/EditorBuildSettings.asset if the scene order changes again.
+        public const int MENU_SCENE = 2;
         private Stack<int> sceneStack = new Stack<int>();
 
         private static SceneStack instance;

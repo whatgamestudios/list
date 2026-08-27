@@ -10,7 +10,7 @@ namespace Lists {
         {
             AuditLog.Log("Welcome screen");
 
-            SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
+            SceneManager.LoadScene("AuthScene", LoadSceneMode.Single);
         }
     }
 }
