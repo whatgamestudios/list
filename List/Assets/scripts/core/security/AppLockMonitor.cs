@@ -11,6 +11,10 @@ namespace Lists {
     // keeps watching across every scene for the whole app run.
     public class AppLockMonitor : MonoBehaviour {
         public const float DefaultReauthTimeoutSeconds = 30f;
+
+        // Sentinel ReauthTimeoutSeconds value meaning "never force re-authentication".
+        public const float NeverTimeoutValue = -1f;
+
         private const string ReauthTimeoutPrefsKey = "REAUTH_TIMEOUT_SECONDS";
 
         private static AppLockMonitor instance;
@@ -65,7 +69,8 @@ namespace Lists {
             double awaySeconds = Time.realtimeSinceStartupAsDouble - focusLostAtRealtime.Value;
             focusLostAtRealtime = null;
 
-            if (awaySeconds >= ReauthTimeoutSeconds) {
+            float timeout = ReauthTimeoutSeconds;
+            if (timeout >= 0 && awaySeconds >= timeout) {
                 ForceReauth(awaySeconds);
             }
         }
