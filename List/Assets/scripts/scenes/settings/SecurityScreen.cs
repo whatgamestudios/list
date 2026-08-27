@@ -18,7 +18,6 @@ namespace Lists {
             ("5 minutes", 300f),
             ("30 minutes", 1800f),
             ("1 hour", 3600f),
-            ("1 day", 86400f),
             ("Never", AppLockMonitor.NeverTimeoutValue),
         };
 
@@ -93,12 +92,13 @@ namespace Lists {
             RectTransform scrollRect = scrollObj.GetComponent<RectTransform>();
             scrollRect.SetParent(panelRect, false);
             // Horizontally: a fixed 900px width centered on the panel (point anchor
-            // at x=0.5 rather than a stretch). Vertically: unchanged full-height
-            // stretch with a 25px inset top and bottom.
+            // at x=0.5 rather than a stretch). Vertically: stretched between the
+            // "TItle" label (bottom edge at panel-local y=855) and the BackButton
+            // (top edge at y=-1040), with a 40px gap on each side.
             scrollRect.anchorMin = new Vector2(0.5f, 0f);
             scrollRect.anchorMax = new Vector2(0.5f, 1f);
-            scrollRect.offsetMin = new Vector2(-450, 25);
-            scrollRect.offsetMax = new Vector2(450, -25);
+            scrollRect.offsetMin = new Vector2(-450, 140);
+            scrollRect.offsetMax = new Vector2(450, -385);
 
             GameObject viewportObj = new GameObject("Viewport", typeof(RectTransform), typeof(RectMask2D));
             RectTransform viewportRect = viewportObj.GetComponent<RectTransform>();
@@ -124,7 +124,7 @@ namespace Lists {
             vlg.childForceExpandWidth = true;
             vlg.childForceExpandHeight = false;
             vlg.spacing = 20;
-            vlg.padding = new RectOffset(20, 20, 20, 20);
+            vlg.padding = new RectOffset(20, 20, 70, 20);
 
             ContentSizeFitter csf = contentObj.GetComponent<ContentSizeFitter>();
             csf.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
@@ -141,7 +141,7 @@ namespace Lists {
             CreateSectionHeader("Change PIN");
             newPinField = CreatePinField("NewPinField", "New PIN");
             confirmPinField = CreatePinField("ConfirmPinField", "Confirm PIN");
-            CreateButton("SavePinButton", "Save PIN", OnButtonClickSavePin);
+            CreateButton("SavePinButton", "Save PIN", OnButtonClickSavePin, 0.75f);
             pinStatusText = CreateStatusText();
 
             CreateSectionHeader("Re-authentication Timeout");
@@ -239,13 +239,28 @@ namespace Lists {
             return inputField;
         }
 
-        private void CreateButton(string name, string labelText, UnityEngine.Events.UnityAction onClick)
+        private void CreateButton(string name, string labelText, UnityEngine.Events.UnityAction onClick, float sizeScale = 1f)
         {
-            GameObject buttonObj = new GameObject(name, typeof(RectTransform), typeof(LayoutElement), typeof(Image), typeof(Button));
+            const float fullHeight = 140f;
+
+            // The row is the layout slot (VerticalLayoutGroup forces it to full
+            // content width and reserves fullHeight of vertical space regardless of
+            // sizeScale); the actual button is a centered child sized down within
+            // it, so a smaller button doesn't collapse its spacing with neighbors.
+            GameObject row = new GameObject(name, typeof(RectTransform), typeof(LayoutElement));
+            RectTransform rowRect = row.GetComponent<RectTransform>();
+            rowRect.SetParent(content, false);
+            LayoutElement rowLayout = row.GetComponent<LayoutElement>();
+            rowLayout.preferredHeight = fullHeight;
+
+            GameObject buttonObj = new GameObject("Button", typeof(RectTransform), typeof(Image), typeof(Button));
             RectTransform buttonRect = buttonObj.GetComponent<RectTransform>();
-            buttonRect.SetParent(content, false);
-            LayoutElement buttonLayout = buttonObj.GetComponent<LayoutElement>();
-            buttonLayout.preferredHeight = 140f;
+            buttonRect.SetParent(rowRect, false);
+            float sideInset = (1f - sizeScale) / 2f;
+            buttonRect.anchorMin = new Vector2(sideInset, sideInset);
+            buttonRect.anchorMax = new Vector2(1f - sideInset, 1f - sideInset);
+            buttonRect.offsetMin = Vector2.zero;
+            buttonRect.offsetMax = Vector2.zero;
             Image buttonBackground = buttonObj.GetComponent<Image>();
             buttonBackground.color = new Color(0.2f, 0.45f, 0.85f, 1f);
             Button button = buttonObj.GetComponent<Button>();
@@ -261,7 +276,7 @@ namespace Lists {
             labelRect.offsetMax = Vector2.zero;
             TextMeshProUGUI label = labelObj.GetComponent<TextMeshProUGUI>();
             label.text = labelText;
-            label.fontSize = 50;
+            label.fontSize = 50; // unchanged regardless of sizeScale
             label.color = Color.white;
             label.alignment = TextAlignmentOptions.Center;
         }
