@@ -85,6 +85,12 @@ namespace Lists {
             titleObj.SetActive(true);
         }
 
+        public void OnButtonClickArchive()
+        {
+            SceneManager.LoadScene("ArchiveAreYouSure", LoadSceneMode.Additive);
+        }
+
+
         public void OnButtonClickAddItem()
         {
             list.Items.Add("");

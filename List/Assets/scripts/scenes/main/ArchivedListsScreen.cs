@@ -6,7 +6,7 @@ using TMPro;
 
 namespace Lists {
 
-    public class MainScreen : MonoBehaviour {
+    public class ArchivedListsScreen : MonoBehaviour {
 
         public GameObject listsPanel;
 
@@ -15,49 +15,19 @@ namespace Lists {
         private const float ItemHeight = 200f;
         private const float ItemImageSize = 90f;
         private const float LeftColumnWidth = ItemImageSize + 20f;
-        private const float AddListButtonWidthReduction = 100f;
 
         private RectTransform listsContent;
-        private RectTransform addItemRow;
 
         public void Start() {
-            AuditLog.Log("Main screen");
+            AuditLog.Log("ArchivedLists screen");
             BuildListsPanel();
         }
 
-        public void OnButtonClickSettings()
+        private void OpenArchivedList(int index)
         {
+            ListsStore.CurrentArchivedListIndex = index;
             SceneStack.Instance().PushScene();
-            SceneManager.LoadScene("SettingsScene", LoadSceneMode.Single);
-        }
-
-        public void OnButtonClickContacts()
-        {
-            SceneStack.Instance().PushScene();
-            SceneManager.LoadScene("ContractsScene", LoadSceneMode.Single);
-        }
-
-        public void OnButtonClickArchivedLists()
-        {
-            SceneStack.Instance().PushScene();
-            SceneManager.LoadScene("ArchivedListsScene", LoadSceneMode.Single);
-        }
-
-        public void OnButtonClickAddItem()
-        {
-            ListEntry entry = new ListEntry();
-            ListsStore.Lists.Add(entry);
-            ListsStore.Save();
-            RectTransform newRow = CreateListItemRow(entry, ListsStore.Lists.Count - 1);
-            newRow.SetSiblingIndex(addItemRow.GetSiblingIndex());
-            AuditLog.Log("Added new list");
-        }
-
-        private void OpenList(int index)
-        {
-            ListsStore.CurrentListIndex = index;
-            SceneStack.Instance().PushScene();
-            SceneManager.LoadScene("ListScene", LoadSceneMode.Single);
+            SceneManager.LoadScene("ArchivedListScene", LoadSceneMode.Single);
         }
 
         private void BuildListsPanel()
@@ -111,12 +81,10 @@ namespace Lists {
             scroll.movementType = ScrollRect.MovementType.Clamped;
             scroll.scrollSensitivity = 30;
 
-            for (int i = 0; i < ListsStore.Lists.Count; i++)
+            for (int i = 0; i < ListsStore.ArchivedLists.Count; i++)
             {
-                CreateListItemRow(ListsStore.Lists[i], i);
+                CreateListItemRow(ListsStore.ArchivedLists[i], i);
             }
-
-            addItemRow = CreateAddItemRow();
 
             scrollObj.SetActive(true);
         }
@@ -135,7 +103,7 @@ namespace Lists {
 
             Button rowButton = row.GetComponent<Button>();
             rowButton.targetGraphic = rowBackground;
-            rowButton.onClick.AddListener(() => OpenList(index));
+            rowButton.onClick.AddListener(() => OpenArchivedList(index));
 
             GameObject typeImageObj = new GameObject("TypeImage", typeof(RectTransform), typeof(Image));
             RectTransform typeImageRect = typeImageObj.GetComponent<RectTransform>();
@@ -184,50 +152,6 @@ namespace Lists {
             titleText.fontSize = 80;
             titleText.color = Color.black;
             titleText.alignment = TextAlignmentOptions.MidlineLeft;
-
-            row.SetActive(true);
-            return rowRect;
-        }
-
-        private RectTransform CreateAddItemRow()
-        {
-            GameObject row = new GameObject("AddItemButton", typeof(RectTransform), typeof(LayoutElement));
-            row.SetActive(false);
-            RectTransform rowRect = row.GetComponent<RectTransform>();
-            rowRect.SetParent(listsContent, false);
-            LayoutElement rowLayout = row.GetComponent<LayoutElement>();
-            rowLayout.preferredHeight = 140f;
-
-            // Narrower visual button inset within the full-width layout row, so it stays
-            // AddListButtonWidthReduction pixels narrower than the other rows without fighting
-            // the VerticalLayoutGroup's childForceExpandWidth on the row itself.
-            GameObject buttonObj = new GameObject("Button", typeof(RectTransform), typeof(Image), typeof(Button));
-            RectTransform buttonRect = buttonObj.GetComponent<RectTransform>();
-            buttonRect.SetParent(rowRect, false);
-            buttonRect.anchorMin = Vector2.zero;
-            buttonRect.anchorMax = Vector2.one;
-            buttonRect.offsetMin = new Vector2(AddListButtonWidthReduction / 2f, 0);
-            buttonRect.offsetMax = new Vector2(-AddListButtonWidthReduction / 2f, 0);
-
-            Image background = buttonObj.GetComponent<Image>();
-            background.color = new Color(0.2f, 0.45f, 0.85f, 1f);
-
-            Button button = buttonObj.GetComponent<Button>();
-            button.targetGraphic = background;
-            button.onClick.AddListener(OnButtonClickAddItem);
-
-            GameObject labelObj = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
-            RectTransform labelRect = labelObj.GetComponent<RectTransform>();
-            labelRect.SetParent(buttonRect, false);
-            labelRect.anchorMin = Vector2.zero;
-            labelRect.anchorMax = Vector2.one;
-            labelRect.offsetMin = Vector2.one;
-            labelRect.offsetMax = Vector2.one;
-            TextMeshProUGUI label = labelObj.GetComponent<TextMeshProUGUI>();
-            label.text = "+ Add List";
-            label.fontSize = 50;
-            label.color = Color.white;
-            label.alignment = TextAlignmentOptions.Center;
 
             row.SetActive(true);
             return rowRect;
