@@ -12,6 +12,12 @@ namespace Lists {
             AuditLog.Log("Settings screen");
         }
 
+        public void OnButtonClickContacts()
+        {
+            SceneStack.Instance().PushScene();
+            SceneManager.LoadScene("ContractsScene", LoadSceneMode.Single);
+        }
+
         public void OnButtonClickCredits()
         {
             SceneStack.Instance().PushScene();

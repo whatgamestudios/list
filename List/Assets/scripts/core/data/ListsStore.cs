@@ -36,6 +36,28 @@ namespace Lists {
             Save();
         }
 
+        // Moves the list at index from ArchivedLists back into Lists and persists the change.
+        public static void RestoreList(int index)
+        {
+            ListEntry entry = ArchivedLists[index];
+            ArchivedLists.RemoveAt(index);
+            Lists.Add(entry);
+            if (CurrentArchivedListIndex == index) {
+                CurrentArchivedListIndex = -1;
+            }
+            Save();
+        }
+
+        // Permanently removes the list at index from ArchivedLists. Cannot be undone.
+        public static void DeleteArchivedList(int index)
+        {
+            ArchivedLists.RemoveAt(index);
+            if (CurrentArchivedListIndex == index) {
+                CurrentArchivedListIndex = -1;
+            }
+            Save();
+        }
+
         public static void Save() {
             SaveData data = new SaveData { Lists = Lists, ArchivedLists = ArchivedLists, CurrentListIndex = CurrentListIndex };
             string json = JsonUtility.ToJson(data);

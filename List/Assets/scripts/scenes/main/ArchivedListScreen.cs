@@ -1,5 +1,6 @@
 // Copyright (c) Whatgame Studios 2024 - 2025
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
@@ -25,6 +26,20 @@ namespace Lists {
                 titleText.text = list.Title;
             }
             BuildListsPanel();
+        }
+
+        public void OnButtonClickRestore()
+        {
+            AuditLog.Log("Restored list: " + list.Title);
+            ListsStore.RestoreList(ListsStore.CurrentArchivedListIndex);
+
+            SceneStack.Instance().Reset();
+            SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
+        }
+
+        public void OnButtonClickDeletePermanently()
+        {
+            SceneManager.LoadScene("DeleteAreYouSure", LoadSceneMode.Additive);
         }
 
         private void BuildListsPanel()

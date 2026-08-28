@@ -18,7 +18,6 @@ namespace Lists {
         private const float AddListButtonWidthReduction = 100f;
 
         private RectTransform listsContent;
-        private RectTransform addItemRow;
         private ListEntry list;
 
         public void Start() {
@@ -96,7 +95,7 @@ namespace Lists {
             list.Items.Add("");
             ListsStore.Save();
             RectTransform newRow = CreateListItemRow(list.Items.Count - 1);
-            newRow.SetSiblingIndex(addItemRow.GetSiblingIndex());
+            newRow.SetSiblingIndex(list.Items.Count);
 
             TMP_InputField newField = newRow.GetComponentInChildren<TMP_InputField>();
             if (newField != null) {
@@ -162,8 +161,6 @@ namespace Lists {
             {
                 CreateListItemRow(i);
             }
-
-            addItemRow = CreateAddItemRow();
 
             scrollObj.SetActive(true);
         }
@@ -238,50 +235,6 @@ namespace Lists {
             inputField.characterLimit = 60;
             inputField.text = list.Items[index];
             inputField.onValueChanged.AddListener(value => { list.Items[index] = value; ListsStore.Save(); });
-        }
-
-        private RectTransform CreateAddItemRow()
-        {
-            GameObject row = new GameObject("AddItemButton", typeof(RectTransform), typeof(LayoutElement));
-            row.SetActive(false);
-            RectTransform rowRect = row.GetComponent<RectTransform>();
-            rowRect.SetParent(listsContent, false);
-            LayoutElement rowLayout = row.GetComponent<LayoutElement>();
-            rowLayout.preferredHeight = 140f;
-
-            // Narrower visual button inset within the full-width layout row, so it stays
-            // AddListButtonWidthReduction pixels narrower than the other rows without fighting
-            // the VerticalLayoutGroup's childForceExpandWidth on the row itself.
-            GameObject buttonObj = new GameObject("Button", typeof(RectTransform), typeof(Image), typeof(Button));
-            RectTransform buttonRect = buttonObj.GetComponent<RectTransform>();
-            buttonRect.SetParent(rowRect, false);
-            buttonRect.anchorMin = Vector2.zero;
-            buttonRect.anchorMax = Vector2.one;
-            buttonRect.offsetMin = new Vector2(AddListButtonWidthReduction / 2f, 0);
-            buttonRect.offsetMax = new Vector2(-AddListButtonWidthReduction / 2f, 0);
-
-            Image background = buttonObj.GetComponent<Image>();
-            background.color = new Color(0.2f, 0.45f, 0.85f, 1f);
-
-            Button button = buttonObj.GetComponent<Button>();
-            button.targetGraphic = background;
-            button.onClick.AddListener(OnButtonClickAddItem);
-
-            GameObject labelObj = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
-            RectTransform labelRect = labelObj.GetComponent<RectTransform>();
-            labelRect.SetParent(buttonRect, false);
-            labelRect.anchorMin = Vector2.zero;
-            labelRect.anchorMax = Vector2.one;
-            labelRect.offsetMin = Vector2.one;
-            labelRect.offsetMax = Vector2.one;
-            TextMeshProUGUI label = labelObj.GetComponent<TextMeshProUGUI>();
-            label.text = "+ Add Item";
-            label.fontSize = 50;
-            label.color = Color.white;
-            label.alignment = TextAlignmentOptions.Center;
-
-            row.SetActive(true);
-            return rowRect;
         }
     }
 }
