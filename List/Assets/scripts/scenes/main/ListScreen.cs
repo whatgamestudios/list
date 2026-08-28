@@ -18,6 +18,7 @@ namespace Lists {
         private const float AddListButtonWidthReduction = 100f;
 
         private RectTransform listsContent;
+        private GameObject scrollViewObj;
         private ListEntry list;
 
         public void Start() {
@@ -106,9 +107,26 @@ namespace Lists {
             AuditLog.Log("Added new item");
         }
 
+        private void DeleteItem(int index)
+        {
+            list.Items.RemoveAt(index);
+            ListsStore.Save();
+            AuditLog.Log("Deleted item");
+
+            // Every row's title-input and swipe closures capture a fixed index, so
+            // once one is removed and later items shift down, the only safe way to
+            // keep them all correct is to rebuild every row from scratch.
+            BuildListsPanel();
+        }
+
         private void BuildListsPanel()
         {
             RectTransform panelRect = listsPanel.GetComponent<RectTransform>();
+
+            if (scrollViewObj != null) {
+                scrollViewObj.SetActive(false);
+                Destroy(scrollViewObj);
+            }
 
             GameObject scrollObj = new GameObject("ListsScrollView", typeof(RectTransform));
             scrollObj.SetActive(false);
@@ -162,22 +180,47 @@ namespace Lists {
                 CreateListItemRow(i);
             }
 
+            scrollViewObj = scrollObj;
             scrollObj.SetActive(true);
         }
 
         private RectTransform CreateListItemRow(int index)
         {
-            GameObject row = new GameObject("ListItem", typeof(RectTransform), typeof(LayoutElement));
+            GameObject row = new GameObject("ListItem", typeof(RectTransform), typeof(LayoutElement), typeof(Image));
             row.SetActive(false);
             RectTransform rowRect = row.GetComponent<RectTransform>();
             rowRect.SetParent(listsContent, false);
             LayoutElement rowLayout = row.GetComponent<LayoutElement>();
             rowLayout.preferredHeight = ItemHeight;
+            Image rowBackground = row.GetComponent<Image>();
+            rowBackground.color = new Color(1f, 1f, 1f, 0.06f);
 
             CreateTitleInputField(rowRect, index);
+            CreateSwipeOverlay(rowRect, rowBackground, index);
 
             row.SetActive(true);
             return rowRect;
+        }
+
+        private void CreateSwipeOverlay(RectTransform rowRect, Image rowBackground, int index)
+        {
+            GameObject overlayObj = new GameObject("SwipeOverlay", typeof(RectTransform), typeof(Image), typeof(SwipeableListItem));
+            RectTransform overlayRect = overlayObj.GetComponent<RectTransform>();
+            overlayRect.SetParent(rowRect, false);
+            overlayRect.anchorMin = Vector2.zero;
+            overlayRect.anchorMax = Vector2.one;
+            overlayRect.offsetMin = Vector2.zero;
+            overlayRect.offsetMax = Vector2.zero;
+
+            // Invisible but still a raycast target, so it's the topmost hit for the
+            // whole row and drags reach it before the TMP_InputField underneath.
+            Image overlayImage = overlayObj.GetComponent<Image>();
+            overlayImage.color = Color.clear;
+
+            SwipeableListItem swipe = overlayObj.GetComponent<SwipeableListItem>();
+            swipe.RowBackground = rowBackground;
+            swipe.ItemField = rowRect.GetComponentInChildren<TMP_InputField>();
+            swipe.OnDeleteRequested = () => DeleteItem(index);
         }
 
         private void CreateTitleInputField(RectTransform rowRect, int index)
