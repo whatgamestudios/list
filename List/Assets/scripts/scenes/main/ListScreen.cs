@@ -175,12 +175,15 @@ namespace Lists {
             scroll.movementType = ScrollRect.MovementType.Clamped;
             scroll.scrollSensitivity = 30;
 
+            // Set before the row-creation loop below, since each row's swipe
+            // overlay needs it to forward vertical drags back to the scroll view.
+            scrollViewObj = scrollObj;
+
             for (int i = 0; i < list.Items.Count; i++)
             {
                 CreateListItemRow(i);
             }
 
-            scrollViewObj = scrollObj;
             scrollObj.SetActive(true);
         }
 
@@ -221,6 +224,7 @@ namespace Lists {
             swipe.RowBackground = rowBackground;
             swipe.ItemField = rowRect.GetComponentInChildren<TMP_InputField>();
             swipe.OnDeleteRequested = () => DeleteItem(index);
+            swipe.ScrollTarget = scrollViewObj;
         }
 
         private void CreateTitleInputField(RectTransform rowRect, int index)
