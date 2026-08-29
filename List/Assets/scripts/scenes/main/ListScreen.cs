@@ -119,6 +119,24 @@ namespace Lists {
             BuildListsPanel();
         }
 
+        private void MoveItem(int index, int direction)
+        {
+            int newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= list.Items.Count) {
+                return;
+            }
+
+            string item = list.Items[index];
+            list.Items.RemoveAt(index);
+            list.Items.Insert(newIndex, item);
+            ListsStore.Save();
+            AuditLog.Log($"Moved item from {index} to {newIndex}");
+
+            // Same reason as DeleteItem: rebuild rather than patch, so every
+            // row's captured index stays correct.
+            BuildListsPanel();
+        }
+
         private void BuildListsPanel()
         {
             RectTransform panelRect = listsPanel.GetComponent<RectTransform>();
@@ -224,6 +242,7 @@ namespace Lists {
             swipe.RowBackground = rowBackground;
             swipe.ItemField = rowRect.GetComponentInChildren<TMP_InputField>();
             swipe.OnDeleteRequested = () => DeleteItem(index);
+            swipe.OnMoveRequested = direction => MoveItem(index, direction);
             swipe.ScrollTarget = scrollViewObj;
         }
 
