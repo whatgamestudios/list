@@ -27,17 +27,9 @@ namespace Lists {
     //         Green -> (swipe left) -> Default, mirroring Red's return path.
     public class SwipeableListItem : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler {
 
-        private enum SwipeState { Default, DarkRed, Red, DarkGreen, Green }
-
         private const float SwipeThreshold = 60f;
         private const float HoldThresholdSeconds = 0.4f;
         private const float ReorderThreshold = 40f;
-
-        private static readonly Color DefaultColor = new Color(1f, 1f, 1f, 0.06f);
-        private static readonly Color DarkRedColor = new Color(0.5f, 0.0f, 0.0f, 1.0f);
-        private static readonly Color RedColor = new Color(0.85f, 0.3f, 0.3f, 0.5f);
-        private static readonly Color DarkGreenColor = new Color(0.0f, 0.39f, 0.15f, 1.0f);
-        private static readonly Color GreenColor = new Color(0.3f, 0.75f, 0.4f, 0.5f);
 
         public Image RowBackground;
         public TMP_InputField ItemField;
@@ -46,16 +38,31 @@ namespace Lists {
         // direction: -1 to move up (earlier in the list), +1 to move down.
         public Action<int> OnMoveRequested;
 
+        // Fires whenever the swipe state changes, so the caller can persist it
+        // (ListsStore) - see also ApplyInitialState, for restoring it on creation.
+        public Action<ItemSwipeState> OnStateChanged;
+
         // The ScrollRect's GameObject. A quick drag that turns out to be
         // predominantly vertical is handed off to this instead of being treated
         // as a swipe, so scrolling still works - see OnBeginDrag.
         public GameObject ScrollTarget;
 
-        private SwipeState state = SwipeState.Default;
+        private ItemSwipeState state = ItemSwipeState.Default;
         private Vector2 dragStartPosition;
         private bool isHorizontalSwipe;
         private bool isHoldDrag;
         private float pointerDownTime;
+
+        // Sets the starting state (e.g. loaded from ListsStore) without treating
+        // it as a new change - RowBackground must already be assigned. Call once,
+        // right after creation.
+        public void ApplyInitialState(ItemSwipeState initial)
+        {
+            state = initial;
+            if (RowBackground != null) {
+                RowBackground.color = ItemSwipeColors.Get(state);
+            }
+        }
 
         public void OnPointerDown(PointerEventData eventData)
         {
@@ -143,20 +150,20 @@ namespace Lists {
         private void HandleSwipeLeft()
         {
             switch (state) {
-                case SwipeState.Default:
-                    SetState(SwipeState.Red);
+                case ItemSwipeState.Default:
+                    SetState(ItemSwipeState.Red);
                     break;
-                case SwipeState.Red:
-                    SetState(SwipeState.DarkRed);
+                case ItemSwipeState.Red:
+                    SetState(ItemSwipeState.DarkRed);
                     break;
-                case SwipeState.DarkRed:
+                case ItemSwipeState.DarkRed:
                     OnDeleteRequested?.Invoke();
                     break;
-                case SwipeState.Green:
-                    SetState(SwipeState.Default);
+                case ItemSwipeState.Green:
+                    SetState(ItemSwipeState.Default);
                     break;
-                case SwipeState.DarkGreen:
-                    SetState(SwipeState.Green);
+                case ItemSwipeState.DarkGreen:
+                    SetState(ItemSwipeState.Green);
                     break;
             }
         }
@@ -164,47 +171,30 @@ namespace Lists {
         private void HandleSwipeRight()
         {
             switch (state) {
-                case SwipeState.DarkRed:
-                    SetState(SwipeState.Red);
+                case ItemSwipeState.DarkRed:
+                    SetState(ItemSwipeState.Red);
                     break;
-                case SwipeState.Red:
-                    SetState(SwipeState.Default);
+                case ItemSwipeState.Red:
+                    SetState(ItemSwipeState.Default);
                     break;
-                case SwipeState.Default:
-                    SetState(SwipeState.Green);
+                case ItemSwipeState.Default:
+                    SetState(ItemSwipeState.Green);
                     break;
-                case SwipeState.Green:
-                    SetState(SwipeState.DarkGreen);
+                case ItemSwipeState.Green:
+                    SetState(ItemSwipeState.DarkGreen);
                     break;
-                case SwipeState.DarkGreen:
+                case ItemSwipeState.DarkGreen:
                     break;
             }
         }
 
-        private void SetState(SwipeState newState)
+        private void SetState(ItemSwipeState newState)
         {
             state = newState;
-            if (RowBackground == null) {
-                return;
+            if (RowBackground != null) {
+                RowBackground.color = ItemSwipeColors.Get(state);
             }
-
-            switch (state) {
-                case SwipeState.Default:
-                    RowBackground.color = DefaultColor;
-                    break;
-                case SwipeState.DarkRed:
-                    RowBackground.color = DarkRedColor;
-                    break;
-                case SwipeState.Red:
-                    RowBackground.color = RedColor;
-                    break;
-                case SwipeState.DarkGreen:
-                    RowBackground.color = DarkGreenColor;
-                    break;
-                case SwipeState.Green:
-                    RowBackground.color = GreenColor;
-                    break;
-            }
+            OnStateChanged?.Invoke(state);
         }
     }
 }

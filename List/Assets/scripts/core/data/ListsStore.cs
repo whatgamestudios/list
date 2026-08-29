@@ -9,6 +9,28 @@ namespace Lists {
     public class ListEntry {
         public string Title = "";
         public List<string> Items = new List<string>();
+
+        // Per-item swipe/marking state (ListScreen), kept in lockstep with Items
+        // by index. Carried along automatically when a list moves between Lists
+        // and ArchivedLists, since it's just a field of the same entry - see
+        // ArchivedListScreen, which renders it read-only.
+        public List<ItemSwipeState> ItemStates = new List<ItemSwipeState>();
+
+        // Pads/trims ItemStates to match Items.Count. Defensive against legacy
+        // saved data from before ItemStates existed, and cheap enough to call
+        // before every read/write of either list.
+        public void EnsureItemStatesLength()
+        {
+            if (ItemStates == null) {
+                ItemStates = new List<ItemSwipeState>();
+            }
+            while (ItemStates.Count < Items.Count) {
+                ItemStates.Add(ItemSwipeState.Default);
+            }
+            if (ItemStates.Count > Items.Count) {
+                ItemStates.RemoveRange(Items.Count, ItemStates.Count - Items.Count);
+            }
+        }
     }
 
     // Store of the lists and their items, persisted to PlayerPrefs.
@@ -76,6 +98,13 @@ namespace Lists {
             Lists = data.Lists ?? new List<ListEntry>();
             ArchivedLists = data.ArchivedLists ?? new List<ListEntry>();
             CurrentListIndex = data.CurrentListIndex;
+
+            foreach (ListEntry entry in Lists) {
+                entry.EnsureItemStatesLength();
+            }
+            foreach (ListEntry entry in ArchivedLists) {
+                entry.EnsureItemStatesLength();
+            }
         }
 
         [Serializable]

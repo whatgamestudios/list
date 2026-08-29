@@ -22,6 +22,7 @@ namespace Lists {
         public void Start() {
             AuditLog.Log("Archived list screen");
             list = ListsStore.ArchivedLists[ListsStore.CurrentArchivedListIndex];
+            list.EnsureItemStatesLength();
             if (titleText != null) {
                 titleText.text = list.Title;
             }
@@ -126,7 +127,15 @@ namespace Lists {
             labelRect.offsetMin = new Vector2(LeftColumnWidth, 0);
             labelRect.offsetMax = new Vector2(0, 0);
             Image labelBackground = labelObj.GetComponent<Image>();
-            labelBackground.color = new Color(0.95f, 0.95f, 0.95f, 1f);
+            // Reflect the swipe state the item had when it was archived (ListScreen).
+            // The Default color there is a near-transparent overlay tint, meant to sit
+            // over a solid panel - that doesn't work here, where this Image is the
+            // item's only background, so Default keeps this screen's original opaque
+            // light color and only the marked states (red/green) use the shared ones.
+            ItemSwipeState itemState = list.ItemStates[index];
+            labelBackground.color = itemState == ItemSwipeState.Default
+                ? new Color(0.95f, 0.95f, 0.95f, 1f)
+                : ItemSwipeColors.Get(itemState);
 
             GameObject textObj = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
             RectTransform textRect = textObj.GetComponent<RectTransform>();
@@ -138,7 +147,7 @@ namespace Lists {
             TextMeshProUGUI itemText = textObj.GetComponent<TextMeshProUGUI>();
             itemText.text = list.Items[index];
             itemText.fontSize = 45;
-            itemText.color = Color.black;
+            itemText.color = itemState == ItemSwipeState.Default ? Color.black : Color.white;
             itemText.alignment = TextAlignmentOptions.MidlineLeft;
         }
     }

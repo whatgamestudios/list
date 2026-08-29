@@ -24,6 +24,7 @@ namespace Lists {
         public void Start() {
             AuditLog.Log("List screen");
             list = ListsStore.Lists[ListsStore.CurrentListIndex];
+            list.EnsureItemStatesLength();
             BuildTitleField();
             BuildListsPanel();
         }
@@ -94,6 +95,7 @@ namespace Lists {
         public void OnButtonClickAddItem()
         {
             list.Items.Add("");
+            list.ItemStates.Add(ItemSwipeState.Default);
             ListsStore.Save();
             RectTransform newRow = CreateListItemRow(list.Items.Count - 1);
             newRow.SetSiblingIndex(list.Items.Count);
@@ -110,6 +112,7 @@ namespace Lists {
         private void DeleteItem(int index)
         {
             list.Items.RemoveAt(index);
+            list.ItemStates.RemoveAt(index);
             ListsStore.Save();
             AuditLog.Log("Deleted item");
 
@@ -127,8 +130,11 @@ namespace Lists {
             }
 
             string item = list.Items[index];
+            ItemSwipeState itemState = list.ItemStates[index];
             list.Items.RemoveAt(index);
+            list.ItemStates.RemoveAt(index);
             list.Items.Insert(newIndex, item);
+            list.ItemStates.Insert(newIndex, itemState);
             ListsStore.Save();
             AuditLog.Log($"Moved item from {index} to {newIndex}");
 
@@ -243,7 +249,9 @@ namespace Lists {
             swipe.ItemField = rowRect.GetComponentInChildren<TMP_InputField>();
             swipe.OnDeleteRequested = () => DeleteItem(index);
             swipe.OnMoveRequested = direction => MoveItem(index, direction);
+            swipe.OnStateChanged = newState => { list.ItemStates[index] = newState; ListsStore.Save(); };
             swipe.ScrollTarget = scrollViewObj;
+            swipe.ApplyInitialState(list.ItemStates[index]);
         }
 
         private void CreateTitleInputField(RectTransform rowRect, int index)
