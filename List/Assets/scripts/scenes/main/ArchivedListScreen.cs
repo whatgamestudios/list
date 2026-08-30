@@ -13,7 +13,6 @@ namespace Lists {
         public GameObject listsPanel;
         public TextMeshProUGUI titleText;
 
-        private const float ItemHeight = 200f;
         private const float LeftColumnWidth = 20f;
 
         private RectTransform listsContent;
@@ -109,7 +108,7 @@ namespace Lists {
             RectTransform rowRect = row.GetComponent<RectTransform>();
             rowRect.SetParent(listsContent, false);
             LayoutElement rowLayout = row.GetComponent<LayoutElement>();
-            rowLayout.preferredHeight = ItemHeight;
+            rowLayout.preferredHeight = ItemFontSizeSettings.CurrentRowHeight;
 
             CreateItemLabel(rowRect, index);
 
@@ -146,7 +145,7 @@ namespace Lists {
             textRect.offsetMax = new Vector2(-20, -10);
             TextMeshProUGUI itemText = textObj.GetComponent<TextMeshProUGUI>();
             itemText.text = list.Items[index];
-            itemText.fontSize = 45;
+            itemText.fontSize = ItemFontSizeSettings.CurrentPointSize;
             itemText.color = itemState == ItemSwipeState.Default ? Color.black : Color.white;
             itemText.alignment = TextAlignmentOptions.MidlineLeft;
         }

@@ -13,7 +13,6 @@ namespace Lists {
 
         private const string DefaultTypeImagePath = "listtypes/listtype-scroll";
         private const string DefaultContactImagePath = "contact-images/contact-none";
-        private const float ItemHeight = 200f;
         private const float LeftColumnWidth = 20f;
         private const float AddListButtonWidthReduction = 100f;
 
@@ -218,7 +217,7 @@ namespace Lists {
             RectTransform rowRect = row.GetComponent<RectTransform>();
             rowRect.SetParent(listsContent, false);
             LayoutElement rowLayout = row.GetComponent<LayoutElement>();
-            rowLayout.preferredHeight = ItemHeight;
+            rowLayout.preferredHeight = ItemFontSizeSettings.CurrentRowHeight;
             Image rowBackground = row.GetComponent<Image>();
             rowBackground.color = new Color(1f, 1f, 1f, 0.06f);
 
@@ -283,7 +282,7 @@ namespace Lists {
             placeholderRect.offsetMax = Vector2.zero;
             TextMeshProUGUI placeholderText = placeholderObj.GetComponent<TextMeshProUGUI>();
             placeholderText.text = "Enter item";
-            placeholderText.fontSize = 45;
+            placeholderText.fontSize = ItemFontSizeSettings.CurrentPointSize;
             placeholderText.fontStyle = FontStyles.Italic;
             placeholderText.color = new Color(0f, 0f, 0f, 0.5f);
             placeholderText.alignment = TextAlignmentOptions.MidlineLeft;
@@ -296,7 +295,7 @@ namespace Lists {
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
             TextMeshProUGUI titleText = textObj.GetComponent<TextMeshProUGUI>();
-            titleText.fontSize = 45;
+            titleText.fontSize = ItemFontSizeSettings.CurrentPointSize;
             titleText.color = Color.black;
             titleText.alignment = TextAlignmentOptions.MidlineLeft;
 

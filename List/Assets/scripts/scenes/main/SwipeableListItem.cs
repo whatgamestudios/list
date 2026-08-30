@@ -30,6 +30,9 @@ namespace Lists {
         private const float SwipeThreshold = 60f;
         private const float HoldThresholdSeconds = 0.4f;
         private const float ReorderThreshold = 40f;
+        private const float TapMaxDistance = 30f;
+        private const float DoubleTapMaxInterval = 0.35f;
+        private const float DoubleTapMaxDistance = 40f;
 
         public Image RowBackground;
         public TMP_InputField ItemField;
@@ -52,6 +55,8 @@ namespace Lists {
         private bool isHorizontalSwipe;
         private bool isHoldDrag;
         private float pointerDownTime;
+        private float lastTapTime = -999f;
+        private Vector2 lastTapPosition;
 
         // Sets the starting state (e.g. loaded from ListsStore) without treating
         // it as a new change - RowBackground must already be assigned. Call once,
@@ -112,20 +117,28 @@ namespace Lists {
                 return;
             }
 
+            Vector2 totalDelta = eventData.position - dragStartPosition;
+
             if (!isHorizontalSwipe) {
                 if (ScrollTarget != null) {
                     ExecuteEvents.Execute<IEndDragHandler>(ScrollTarget, eventData, ExecuteEvents.endDragHandler);
                 }
+                // A "vertical" classification on a near-zero movement is just
+                // jitter, not an actual scroll attempt - still counts as a tap.
+                if (totalDelta.magnitude < TapMaxDistance) {
+                    RegisterTap(eventData.position);
+                }
                 return;
             }
 
-            float deltaX = eventData.position.x - dragStartPosition.x;
-
-            if (Mathf.Abs(deltaX) < SwipeThreshold) {
+            if (Mathf.Abs(totalDelta.x) < SwipeThreshold) {
+                if (totalDelta.magnitude < TapMaxDistance) {
+                    RegisterTap(eventData.position);
+                }
                 return;
             }
 
-            if (deltaX < 0) {
+            if (totalDelta.x < 0) {
                 HandleSwipeLeft();
             } else {
                 HandleSwipeRight();
@@ -134,8 +147,29 @@ namespace Lists {
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.clickCount >= 2) {
+            // Covers the case OnBeginDrag/OnEndDrag never fire at all - a
+            // genuinely zero-movement mouse click (Editor testing). Real touch
+            // taps almost always move a few pixels and get classified as a
+            // micro-drag instead, which is why OnEndDrag also calls RegisterTap.
+            RegisterTap(eventData.position);
+        }
+
+        // Independent of Unity's own click-count tracking (unreliable here,
+        // since this component also implements IBeginDragHandler - once a drag
+        // starts, Unity won't fire OnPointerClick on release at all, which is
+        // true for nearly every real touch tap due to ordinary finger jitter).
+        private void RegisterTap(Vector2 position)
+        {
+            float now = Time.unscaledTime;
+            bool isDoubleTap = now - lastTapTime <= DoubleTapMaxInterval
+                && Vector2.Distance(position, lastTapPosition) <= DoubleTapMaxDistance;
+
+            if (isDoubleTap) {
                 ActivateEditing();
+                lastTapTime = -999f; // consumed, so a 3rd quick tap doesn't chain into another double-tap
+            } else {
+                lastTapTime = now;
+                lastTapPosition = position;
             }
         }
 

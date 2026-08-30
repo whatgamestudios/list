@@ -47,5 +47,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/main/DeleteAreYouSure.unity
     guid: 4bfa10acb5a4a47b68e8f00c79a3d813
+  - enabled: 1
+    path: Assets/Scenes/settings/FontSizeScene.unity
+    guid: abbe2194a1d0b4ebf810c81757a60f04
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

@@ -35,5 +35,11 @@ namespace Lists {
             SceneStack.Instance().PushScene();
             SceneManager.LoadScene("BackgroundsScene", LoadSceneMode.Single);
         }
+
+        public void OnButtonClickFontSize()
+        {
+            SceneStack.Instance().PushScene();
+            SceneManager.LoadScene("FontSizeScene", LoadSceneMode.Single);
+        }
     }
 }
