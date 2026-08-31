@@ -12,12 +12,11 @@ namespace Lists {
     // MonoBehaviour) that reports its result through onComplete, since
     // UnityWebRequest's async model doesn't return a value directly.
     public static class ServerClient {
+        // Verified live: with no vercel.json rewrite, Vercel's zero-config
+        // Python/FastAPI detection mounts the app at the plain root - no
+        // path prefix needed (an earlier assumption that it needed /fastapi,
+        // based on misreading the deployment summary, was wrong).
         private const string BaseUrl = "https://list-two-pi.vercel.app";
-
-        // Vercel's zero-config Python/FastAPI detection auto-mounts the app
-        // under this prefix (see the deployment summary) - there's no
-        // vercel.json rewrite overriding it, so every route needs it too.
-        private const string ApiPrefix = "/fastapi";
 
         [Serializable]
         private class GetUserRequestBody {
@@ -86,7 +85,7 @@ namespace Lists {
 
         private static UnityWebRequest PostJson(string path, string json)
         {
-            string url = BaseUrl.TrimEnd('/') + ApiPrefix + path;
+            string url = BaseUrl.TrimEnd('/') + path;
             UnityWebRequest request = new UnityWebRequest(url, "POST");
             byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);

@@ -69,7 +69,7 @@ vercel
 
 Set `DATABASE_URL` as an environment variable in the Vercel project (Project → Settings → Environment Variables) - it is not picked up from your local `.env` file.
 
-Vercel's zero-config Python/FastAPI detection auto-mounts the app under `/fastapi` (check the deployment summary after deploying to confirm) - there's no `vercel.json` here overriding that, so once deployed the endpoints are at `https://your-project.vercel.app/fastapi/getUser` etc., not at the bare root the way they are locally. (An earlier version of this project shipped a `vercel.json` rewrite trying to force everything to the root; that actively broke routing once Vercel started honoring rewrite destination paths for backend-framework projects, so it's been removed rather than fought.)
+Vercel's zero-config Python/FastAPI detection mounts the app at the plain root - verified live against a real deployment, so `https://your-project.vercel.app/getUser` etc., same shape as running locally. (An earlier version of this project shipped a `vercel.json` rewrite trying to force routing to a fixed destination path; that actively broke things once Vercel started honoring rewrite destination paths for backend-framework projects, so it's been removed rather than fought. A later guess that the zero-config mount used a `/fastapi` prefix was also wrong and has been corrected.)
 
 ### Testing /deleteUser locally
 
