@@ -7,6 +7,7 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from psycopg import errors
 from psycopg.rows import dict_row
 from pydantic import BaseModel
@@ -18,6 +19,11 @@ DATABASE_URL = os.environ["DATABASE_URL"]
 
 def get_connection():
     return psycopg.connect(DATABASE_URL, row_factory=dict_row)
+
+
+@app.get("/", response_class=HTMLResponse)
+def root() -> str:
+    return "<!doctype html><html><head><title>Lotsalists App Server</title></head><body><h1>Lotsalists App Server</h1></body></html>"
 
 
 class GetUserRequest(BaseModel):
