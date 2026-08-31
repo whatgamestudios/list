@@ -10,7 +10,8 @@ namespace Lists {
         {
             AuditLog.Log("Welcome screen");
 
-            SceneManager.LoadScene("AuthScene", LoadSceneMode.Single);
+            string nextScene = ProfileStore.HasProfileName() ? "AuthScene" : "RegistrationScene";
+            SceneManager.LoadScene(nextScene, LoadSceneMode.Single);
         }
     }
 }

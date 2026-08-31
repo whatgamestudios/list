@@ -16,7 +16,6 @@ server/
     index.py       # FastAPI app and routes - Vercel's serverless entrypoint
   schema.sql        # run once against your Neon database
   requirements.txt
-  vercel.json
   .env.example
 ```
 
@@ -69,6 +68,8 @@ vercel
 ```
 
 Set `DATABASE_URL` as an environment variable in the Vercel project (Project → Settings → Environment Variables) - it is not picked up from your local `.env` file.
+
+Vercel's zero-config Python/FastAPI detection auto-mounts the app under `/fastapi` (check the deployment summary after deploying to confirm) - there's no `vercel.json` here overriding that, so once deployed the endpoints are at `https://your-project.vercel.app/fastapi/getUser` etc., not at the bare root the way they are locally. (An earlier version of this project shipped a `vercel.json` rewrite trying to force everything to the root; that actively broke routing once Vercel started honoring rewrite destination paths for backend-framework projects, so it's been removed rather than fought.)
 
 ### Testing /deleteUser locally
 

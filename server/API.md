@@ -1,6 +1,6 @@
 # API
 
-Base URL: your Vercel deployment URL (e.g. `https://your-project.vercel.app`), or `http://127.0.0.1:8000` when running locally.
+Base URL: your Vercel deployment URL **plus `/fastapi`** (e.g. `https://your-project.vercel.app/fastapi`) - Vercel's zero-config Python/FastAPI detection auto-mounts the app under that prefix; there's no `vercel.json` rewrite overriding it. Locally (no Vercel involved) there's no prefix: just `http://127.0.0.1:8000`.
 
 All endpoints are `POST`, take a JSON request body, and return a JSON response body.
 
