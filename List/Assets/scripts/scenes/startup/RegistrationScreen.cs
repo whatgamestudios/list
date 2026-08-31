@@ -41,7 +41,7 @@ namespace Lists {
         public void OnImageClicked()
         {
             SceneStack.Instance().PushScene();
-            SceneManager.LoadScene("ProfileScene", LoadSceneMode.Single);
+            SceneManager.LoadScene("ProfileImageScene", LoadSceneMode.Single);
         }
 
         public void OnButtonClickRegister()

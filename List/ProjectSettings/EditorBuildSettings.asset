@@ -54,7 +54,10 @@ EditorBuildSettings:
     path: Assets/Scenes/settings/FontSizeScene.unity
     guid: abbe2194a1d0b4ebf810c81757a60f04
   - enabled: 1
-    path: Assets/Scenes/settings/ProfileScene.unity
+    path: Assets/Scenes/settings/ProfileImageScene.unity
     guid: fdd9a77cc5f1547c7a3eee74bbdb4988
+  - enabled: 1
+    path: Assets/Scenes/settings/ProfileScene.unity
+    guid: 3d65c60e88434357a07cb2f0bf793ff6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

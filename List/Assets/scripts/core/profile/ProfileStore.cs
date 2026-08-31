@@ -69,7 +69,7 @@ namespace Lists {
 
         /**
         * Set the tentative (not yet registered) name the user is typing in
-        * RegistrationScreen, so it survives a trip to ProfileScene and back.
+        * RegistrationScreen, so it survives a trip to ProfileImageScene and back.
         * Distinct from PROFILE_NAME, which is only set once registration with
         * the server actually succeeds.
         */
