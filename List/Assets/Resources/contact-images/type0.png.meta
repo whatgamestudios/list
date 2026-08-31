@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 86a0c16eb1b4449ab8a28e57c9637bbc
+guid: e898a9ee759314a3ba651c409eb176a9
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6154396246862890919
-    second: contact-woman1_0
+      213: 334855646556437884
+    second: type0_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,13 +139,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: contact-woman1_0
+      name: type0_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 400
-        height: 400
+        width: 406
+        height: 416
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7a7824577cec86550800000000000000
-      internalID: 6154396246862890919
+      spriteID: c7db708bf65a5a400800000000000000
+      internalID: 334855646556437884
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      contact-woman1_0: 6154396246862890919
+      type0_0: 334855646556437884
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
