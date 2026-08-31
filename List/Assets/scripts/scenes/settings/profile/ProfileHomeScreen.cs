@@ -27,14 +27,14 @@ namespace Lists {
 
         public void OnButtonClickShare()
         {
-            // TODO: implement profile sharing.
-            AuditLog.Log("Share profile clicked (not implemented yet)");
+            SceneStack.Instance().PushScene();
+            SceneManager.LoadScene("ProfileShareScene", LoadSceneMode.Single);
         }
 
-        public void OnButtonClickDelete()
+        public void OnButtonClickDangerous()
         {
-            // TODO: implement profile deletion.
-            AuditLog.Log("Delete profile clicked (not implemented yet)");
+            SceneStack.Instance().PushScene();
+            SceneManager.LoadScene("ProfileDangerousScene", LoadSceneMode.Single);
         }
     }
 }
